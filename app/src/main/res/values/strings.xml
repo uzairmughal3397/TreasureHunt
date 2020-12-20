@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Treasure Hunting</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDw4C12e0pq6NRJiY6-UZS6SNwpZJE6-10</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

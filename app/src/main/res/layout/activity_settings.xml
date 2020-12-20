@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/clMain"
+        android:background="@color/white"
+        tools:context=".activities.settingsActivity.SettingsActivity">
+
+        <TextView
+            android:id="@+id/tvListOfFoundGeoCaches"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:layout_marginEnd="@dimen/_16sdp"
+            android:background="@color/yellow"
+            android:padding="@dimen/_8sdp"
+            android:paddingStart="@dimen/_16sdp"
+            android:text="Lists of found geo caches"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="30dp" />
+
+        <TextView
+            android:id="@+id/tvListOfRemainingGeoCaches"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/yellow"
+            android:padding="@dimen/_8sdp"
+            android:text="Lists of remaining geo caches"
+            android:textColor="@color/black"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:paddingStart="@dimen/_16sdp"
+            app:layout_constraintEnd_toEndOf="@id/tvListOfFoundGeoCaches"
+            app:layout_constraintStart_toStartOf="@id/tvListOfFoundGeoCaches"
+            app:layout_constraintTop_toBottomOf="@id/tvListOfFoundGeoCaches"
+            tools:layout_editor_absoluteX="0dp"
+            tools:layout_editor_absoluteY="30dp" />
+
+        <TextView
+            android:id="@+id/tvSetRadius"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/yellow"
+            android:padding="@dimen/_8sdp"
+            android:text="Set Radius"
+            android:textColor="@color/black"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:paddingStart="@dimen/_16sdp"
+            app:layout_constraintEnd_toEndOf="@id/tvListOfFoundGeoCaches"
+            app:layout_constraintStart_toStartOf="@id/tvListOfFoundGeoCaches"
+            app:layout_constraintTop_toBottomOf="@id/tvListOfRemainingGeoCaches"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="98dp" />
+
+        <TextView
+            android:id="@+id/tvVoiceOutput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/yellow"
+            android:padding="@dimen/_8sdp"
+            android:text="Voice Output"
+            android:layout_marginTop="@dimen/_16sdp"
+            android:paddingStart="@dimen/_16sdp"
+            app:layout_constraintEnd_toEndOf="@id/tvListOfFoundGeoCaches"
+            app:layout_constraintStart_toStartOf="@id/tvListOfFoundGeoCaches"
+            app:layout_constraintTop_toBottomOf="@id/tvSetRadius"
+            android:textColor="@color/black"
+            tools:layout_editor_absoluteX="33dp"
+            tools:layout_editor_absoluteY="202dp" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            app:layout_constraintTop_toTopOf="@id/tvVoiceOutput"
+            app:layout_constraintEnd_toEndOf="@id/tvVoiceOutput"
+            app:layout_constraintBottom_toBottomOf="@id/tvVoiceOutput"
+            android:layout_width="wrap_content"
+            android:id="@+id/switchVoiceOutput"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="280dp"
+            tools:layout_editor_absoluteY="203dp" />
+
+        <TextView
+            android:id="@+id/tvExportDb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/yellow"
+            android:padding="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_16sdp"
+            app:layout_constraintTop_toBottomOf="@id/tvVoiceOutput"
+            app:layout_constraintStart_toStartOf="@id/tvListOfRemainingGeoCaches"
+            app:layout_constraintEnd_toEndOf="@id/tvListOfRemainingGeoCaches"
+            android:text="Export Database"
+            android:textColor="@color/black"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="255dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
