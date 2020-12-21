@@ -63,6 +63,18 @@
             app:layout_constraintTop_toBottomOf="@id/tvListOfRemainingGeoCaches"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="98dp" />
+        <TextView
+            app:layout_constraintEnd_toEndOf="@id/tvSetRadius"
+            app:layout_constraintBottom_toBottomOf="@id/tvSetRadius"
+            app:layout_constraintTop_toTopOf="@id/tvSetRadius"
+            android:id="@+id/tvCurrentRadius"
+            android:background="@color/yellow"
+            android:padding="@dimen/_8sdp"
+            android:text="Current Radius"
+            android:textColor="@color/black"
+            android:paddingStart="@dimen/_16sdp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:id="@+id/tvVoiceOutput"
