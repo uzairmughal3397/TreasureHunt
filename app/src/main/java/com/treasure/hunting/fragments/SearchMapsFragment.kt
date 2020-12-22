@@ -1,6 +1,7 @@
 package com.treasure.hunting.fragments
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -36,13 +37,14 @@ class SearchMapsFragment : Fragment(), LocationListener {
     lateinit var lng: String
     private lateinit var mapFragment: SupportMapFragment
     private var locationManager: LocationManager? = null
-    private val MIN_TIME: Long = 400
-    private val MIN_DISTANCE = 100f
+    private val MIN_TIME: Long = 10
+    private val MIN_DISTANCE = 10f
     var locationLiveData = MutableLiveData<Location>()
     private lateinit var fragMapsBinding: FragmentSearchMapsBinding
     private lateinit var selectedLatLng: LatLng
     var tts: TextToSpeech? = null
     lateinit var gMap: GoogleMap
+    val nearbyTreausre = arrayListOf<Int>()
 
     private val onMapReadyCallback = OnMapReadyCallback { googleMap ->
 
@@ -50,6 +52,8 @@ class SearchMapsFragment : Fragment(), LocationListener {
         locationLiveData.observe(this, {
 
             gMap = googleMap
+            setUpMarkersFromDb()
+
             if (fragMapsBinding.tvTitle.isVisible)
                 hideLoadingView()
             val latLng = LatLng(it.latitude, it.longitude)
@@ -69,7 +73,6 @@ class SearchMapsFragment : Fragment(), LocationListener {
             gMap.addMarker(marker)
             gMap.animateCamera(cameraUpdateFactory)
 
-            setUpMarkersFromDb()
 
             fragMapsBinding.btnComplete.hide()
 
@@ -82,6 +85,14 @@ class SearchMapsFragment : Fragment(), LocationListener {
                         selectedLat.toString(),
                         selectedLng.toString()
                     )
+
+                val alertBuilder = AlertDialog.Builder(requireContext())
+                alertBuilder.setMessage("Treasure Completed")
+                alertBuilder.setCancelable(true)
+                alertBuilder.setPositiveButton("Ok") { dialogInterface, _ -> dialogInterface.cancel() }
+                alertBuilder.create().show()
+
+
                 gMap.clear()
                 setUpMarkersFromDb()
 
@@ -121,6 +132,13 @@ class SearchMapsFragment : Fragment(), LocationListener {
                             it.lng!!.toDouble()
                         )
                     )
+
+
+                    if (!nearbyTreausre.contains(it.taskId)) {
+                        nearbyTreausre.add(it.taskId!!)
+                        showMessage("There a treasure near you")
+                    }
+
                     marker.title(it.imageName)
                     marker.snippet(it.imagDes)
                     marker.icon(BitmapDescriptorFactory.fromResource(it.imageId))
@@ -129,7 +147,6 @@ class SearchMapsFragment : Fragment(), LocationListener {
                     gMap.setOnInfoWindowClickListener { selectedMarker ->
                         selectedLatLng = selectedMarker.position
                         fragMapsBinding.btnComplete.show()
-                        true
                     }
 
                     /*Drawing the circles around marker*/
@@ -183,8 +200,39 @@ class SearchMapsFragment : Fragment(), LocationListener {
 
         mapFragment.getMapAsync(onMapReadyCallback)
 
+        //Get Current Location continuously after specific times.
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
 
-        getLastLocation()
+        locationManager!!.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            MIN_TIME,
+            MIN_DISTANCE,
+            this
+        )
+
+        fragMapsBinding.btnCurrentLoc.setOnClickListener {
+            showLoadingView()
+            locationManager!!.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this
+            )
+        }
+
     }
 
     private fun getLastLocation() {
@@ -217,19 +265,15 @@ class SearchMapsFragment : Fragment(), LocationListener {
             this
         )
 
-        fragMapsBinding.btnCurrentLoc.setOnClickListener {
-            locationManager!!.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this
-            )
-        }
     }
 
 
     //when ever the location changes it will assign to liveData object
     override fun onLocationChanged(location: Location) {
         locationLiveData.value = location
+        hideLoadingView()
         mapFragment.getMapAsync(onMapReadyCallback)
-        locationManager!!.removeUpdates(this)
+//        locationManager!!.removeUpdates(this)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -244,7 +288,6 @@ class SearchMapsFragment : Fragment(), LocationListener {
         showMessage("Unable to get location provider")
     }
 
-
     private fun showMessage(msg: String) {
         if (SharedPrefHelper().readBoolean(requireContext(), AppConstants.VOICE_KEY)) {
             tts!!.language = Locale.UK
@@ -256,6 +299,11 @@ class SearchMapsFragment : Fragment(), LocationListener {
     private fun hideLoadingView() {
         fragMapsBinding.tvTitle.visibility = View.GONE
         fragMapsBinding.pbLoading.visibility = View.GONE
+    }
+
+    private fun showLoadingView() {
+        fragMapsBinding.tvTitle.visibility = View.VISIBLE
+        fragMapsBinding.pbLoading.visibility = View.VISIBLE
     }
 
     private fun calculateDistance(
@@ -278,4 +326,8 @@ class SearchMapsFragment : Fragment(), LocationListener {
         return inRadius
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        locationManager!!.removeUpdates(this)
+    }
 }

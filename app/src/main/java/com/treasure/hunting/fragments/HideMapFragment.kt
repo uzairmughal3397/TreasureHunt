@@ -8,6 +8,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,8 +36,8 @@ class HideMapFragment : Fragment(), LocationListener {
     lateinit var lng: String
     private lateinit var mapFragment: SupportMapFragment
     private var locationManager: LocationManager? = null
-    private val MIN_TIME: Long = 400
-    private val MIN_DISTANCE = 100f
+    private val MIN_TIME: Long = 10
+    private val MIN_DISTANCE = 10f
     var locationLiveData = MutableLiveData<Location>()
     lateinit var fragMapsBinding: FragmentHideMapBinding
 
@@ -44,9 +45,9 @@ class HideMapFragment : Fragment(), LocationListener {
 
         //Realtime Observer which will trigger when locationLiveData gets location.
         locationLiveData.observe(this, {
-
             if (fragMapsBinding.tvTitle.isVisible)
                 hideLoadingView()
+
             val latLng = LatLng(it.latitude, it.longitude)
             lat = it.latitude.toString()
             lng = it.longitude.toString()
@@ -90,8 +91,46 @@ class HideMapFragment : Fragment(), LocationListener {
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
 
+
+        mapFragment.getMapAsync(onMapReadyCallback)
+
+        //Get Current Location continuously after specific times.
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+
+        locationManager!!.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            MIN_TIME,
+            MIN_DISTANCE,
+            this
+        )
+
+        fragMapsBinding.btnCurrentLoc.setOnClickListener {
+            showLoadingView()
+            locationManager!!.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this
+            )
+        }
+
+
+
         /*Getting last known location and trying to get current location*/
-        getLastLocation()
+//        getLastLocation()
 
     }
 
@@ -135,8 +174,8 @@ class HideMapFragment : Fragment(), LocationListener {
     //when ever the location changes it will assign to liveData object
     override fun onLocationChanged(location: Location) {
         locationLiveData.value = location
+        hideLoadingView()
         mapFragment.getMapAsync(onMapReadyCallback)
-        locationManager!!.removeUpdates(this)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -164,5 +203,16 @@ class HideMapFragment : Fragment(), LocationListener {
         fragMapsBinding.pbLoading.visibility = View.GONE
     }
 
+    private fun showLoadingView() {
+        fragMapsBinding.tvTitle.visibility = View.VISIBLE
+        fragMapsBinding.pbLoading.visibility = View.VISIBLE
+    }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
 }
